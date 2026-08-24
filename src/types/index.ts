@@ -11,12 +11,8 @@ export interface User {
   created_at: string
 }
 
-export interface AuthTokens {
-  access: string
-  refresh: string
-}
-
-export interface LoginResponse extends AuthTokens {
+/** Tokens are now HttpOnly cookies — the login response only carries user info. */
+export interface LoginResponse {
   user: User
 }
 
@@ -38,12 +34,16 @@ export interface ServiceCategory {
   id: number
   name: string
   color: string
+  service_count: number
+  created_at: string
 }
 
 export interface Service {
   id: number
   name: string
-  category: ServiceCategory
+  category: ServiceCategory | null
+  category_name: string | null
+  category_color: string | null
   duration_minutes: number
   price: string
   description: string
@@ -56,6 +56,7 @@ export interface Employee {
   user: User
   name: string
   phone: string
+  email: string
   role: string
   salary: string
   commission_pct: string
@@ -69,9 +70,17 @@ export type AppointmentStatus = 'pending' | 'confirmed' | 'in_progress' | 'compl
 
 export interface Appointment {
   id: number
-  customer: Customer
-  employee: Employee
-  service: Service
+  // List serializer flat fields
+  customer: number
+  customer_name: string
+  customer_phone: string
+  employee: number | null
+  employee_name: string | null
+  service: number | null
+  service_name: string | null
+  service_duration: number | null
+  service_price: string | null
+  category_color: string | null
   date: string
   start_time: string
   end_time: string
@@ -98,8 +107,11 @@ export interface Product {
   selling_price: string
   stock_quantity: number
   min_stock_level: number
-  supplier: Supplier | null
+  supplier: number | null
+  supplier_name: string | null
   is_active: boolean
+  is_low_stock: boolean
+  created_at: string
 }
 
 // POS / Sales
@@ -109,8 +121,9 @@ export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded'
 export interface SaleItem {
   id: number
   item_type: 'service' | 'product'
-  service?: Service
-  product?: Product
+  service?: number | null
+  product?: number | null
+  item_name: string
   quantity: number
   unit_price: string
   discount_amount: string
@@ -119,8 +132,10 @@ export interface SaleItem {
 
 export interface Sale {
   id: number
-  customer: Customer | null
-  employee: Employee
+  customer: number | null
+  customer_detail?: Customer | null
+  employee: number | null
+  employee_detail?: Employee | null
   receipt_number: string
   subtotal: string
   discount_amount: string
@@ -128,7 +143,9 @@ export interface Sale {
   total_amount: string
   payment_status: PaymentStatus
   sale_date: string
+  notes: string
   items: SaleItem[]
+  created_at: string
 }
 
 export interface Payment {
@@ -171,4 +188,5 @@ export interface CartItem {
   unit_price: number
   quantity: number
   discount_amount: number
+  max_quantity?: number
 }
