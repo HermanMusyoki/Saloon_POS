@@ -15,33 +15,35 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser]       = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // Restore user profile from localStorage (non-sensitive, no tokens)
     const stored = tokenStorage.getUser()
-    const token = tokenStorage.getAccess()
-    if (stored && token) setUser(stored)
-    setIsLoading(false)
+    if (stored) {
+      setUser(stored)
+      setIsLoading(false)
+    } else {
+      setIsLoading(false)
+    }
   }, [])
 
   const login = async (email: string, password: string) => {
-    const data = await authApi.login(email, password)
-    tokenStorage.setTokens(data.access, data.refresh)
-    tokenStorage.setUser(data.user)
-    setUser(data.user)
+    // Server sets saloonspa_access + saloonspa_refresh as HttpOnly cookies
+    const { user: userData } = await authApi.login(email, password)
+    tokenStorage.setUser(userData)
+    setUser(userData)
   }
 
   const logout = async () => {
-    const refresh = tokenStorage.getRefresh()
-    if (refresh) {
-      try {
-        await authApi.logout(refresh)
-      } catch {
-        // ignore logout errors
-      }
+    try {
+      // Server blacklists refresh token and clears both cookies
+      await authApi.logout()
+    } catch {
+      // Even if the server call fails, clear local state
     }
-    tokenStorage.clearTokens()
+    tokenStorage.clearUser()
     setUser(null)
   }
 
