@@ -5,6 +5,7 @@ interface CartState {
   items: CartItem[]
   customerId: number | null
   employeeId: number | null
+  idempotencyKey: string
   addItem: (item: CartItem) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
@@ -19,6 +20,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   items: [],
   customerId: null,
   employeeId: null,
+  idempotencyKey: crypto.randomUUID(),
 
   addItem: (item) =>
     set((state) => {
@@ -49,14 +51,14 @@ export const useCartStore = create<CartState>((set, get) => ({
   setCustomer: (id) => set({ customerId: id }),
   setEmployee: (id) => set({ employeeId: id }),
 
-  clearCart: () => set({ items: [], customerId: null, employeeId: null }),
+  clearCart: () => set({ items: [], customerId: null, employeeId: null, idempotencyKey: crypto.randomUUID() }),
 
   totals: () => {
     const { items } = get()
     const subtotal = items.reduce((sum, i) => sum + i.unit_price * i.quantity, 0)
     const discount = items.reduce((sum, i) => sum + i.discount_amount * i.quantity, 0)
     const taxable = subtotal - discount
-    const tax = 0 // configure tax rate as needed
+    const tax = 0
     return { subtotal, discount, tax, total: taxable + tax }
   },
 }))
