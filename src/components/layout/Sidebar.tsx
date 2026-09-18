@@ -34,7 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Services', href: '/services', icon: Scissors, roles: ['admin', 'receptionist'] },
   { label: 'Employees', href: '/employees', icon: UserCog, roles: ['admin'] },
   { label: 'POS', href: '/pos', icon: ShoppingCart, roles: ['admin', 'receptionist', 'cashier'] },
-  { label: 'Inventory', href: '/inventory', icon: Package, roles: ['admin'] },
+  { label: 'Inventory', href: '/inventory', icon: Package, roles: ['admin', 'cashier'] },
   { label: 'Expenses', href: '/expenses', icon: Wallet, roles: ['admin'] },
   { label: 'Reports', href: '/reports', icon: BarChart3, roles: ['admin', 'cashier'] },
   { label: 'Receipts', href: '/receipts', icon: Receipt, roles: ['admin', 'cashier'] },
